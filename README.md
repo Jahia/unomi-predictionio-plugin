@@ -44,6 +44,7 @@ Build, Train & deploy Lead Scoring PredictionIO template:
 
     git clone https://github.com/sergehuber/template-scala-parallel-leadscoring.git MyLeadScoring
     cd MyLeadScoring
+    export PATH=**REPLACE_WITH_PATH_TO_PREDICTIONIO_SRC**/docker/bin/:$PATH    
     pio-docker build --verbose
     pio-docker app list
     ACCESS_KEY=cdelLgZqZxj7CI_2hDM_vy-Q3fhLDxlTQKao_UHe9DgcFLkSVm9Yfq_3ve8BTgzl
