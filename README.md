@@ -51,10 +51,22 @@ Build, Train & deploy Lead Scoring PredictionIO template:
     pio-docker train
     pio-docker deploy
     
+Download, configure and start ElasticSearch 5.6.3
+    
+    curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.3.tar.gz
+    tar zxvf elasticsearch-5.6.3.tar.gz
+    cd elasticsearch-5.6.3
+    change cluster.name to cluster.name: contextElasticSearch in config/elasticsearch.yml file
+    bin/elasticsearch
+    
 Compile & start Apache Unomi:
     
+    git clone https://github.com/apache/unomi.git
+    cd unomi
+    ./buildAndRunNoTests.sh
+    unomi:start (in Karaf shell) 
     
-Deploy plugin to Apache Unomi:
+Deploy plugin to Apache Unomi (in Karaf shell):
 
     feature:repo-add mvn:org.apache.unomi/unomi-predictionio-kar/${project.version}/xml/features
     feature:install unomi-predictionio-kar
