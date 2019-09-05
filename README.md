@@ -18,13 +18,18 @@
 Requirements
 ------------
 - Apache PredictionIO 0.13.0+
-- PredictionIO Lead Scoring Template 
+- PredictionIO Lead Scoring Template
+- Apache Unomi 1.3.0+ 
 
 Installation
 ------------ 
 
-Start PredictionIO:
+Install & Start PredictionIO:
 
+    git clone https://github.com/apache/predictionio.git
+    cd predictionio
+    cd docker
+    docker build -t predictionio/pio pio
     docker-compose -f docker-compose.yml \
          -f pgsql/docker-compose.base.yml \
          -f pgsql/docker-compose.meta.yml \
@@ -32,9 +37,24 @@ Start PredictionIO:
          -f pgsql/docker-compose.model.yml \
          up
 
+Build, Train & deploy Lead Scoring PredictionIO template:
 
-feature:repo-add mvn:org.apache.unomi/unomi-predictionio-kar/${project.version}/xml/features
-feature:install unomi-predictionio-kar
+    git clone https://github.com/sergehuber/template-scala-parallel-leadscoring.git MyLeadScoring
+    cd MyLeadScoring
+    pio-docker build --verbose
+    pio-docker app list
+    ACCESS_KEY=cdelLgZqZxj7CI_2hDM_vy-Q3fhLDxlTQKao_UHe9DgcFLkSVm9Yfq_3ve8BTgzl
+    python data/import_eventserver.py --access_key $ACCESS_KEY
+    pio-docker train
+    pio-docker deploy
+    
+Compile & start Apache Unomi:
+    
+    
+Deploy plugin to Apache Unomi:
+
+    feature:repo-add mvn:org.apache.unomi/unomi-predictionio-kar/${project.version}/xml/features
+    feature:install unomi-predictionio-kar
 
 Test request
 ------------
@@ -113,5 +133,5 @@ should return something like:
       "consents": {}
     }
     
-The `leadScoringPrediction` property should be there and have a value that represents the probability that the visitor
+The `leadScoringProbability` property should be there and have a value that represents the probability that the visitor
 will convert.    
