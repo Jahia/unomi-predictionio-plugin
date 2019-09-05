@@ -15,6 +15,9 @@
   ~ limitations under the License.
   -->
 
+Apache Unomi - Apache PredictionIO Integration example
+======================================================
+
 Requirements
 ------------
 - Apache PredictionIO 0.13.0+
