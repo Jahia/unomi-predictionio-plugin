@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "id": "pageViewPredictLeadScore",
+    "name": "Predict lead score on page view event",
+    "description": ""
+  },
+  "raiseEventOnlyOnceForSession": false,
+  "condition": {
+      "type": "eventTypeCondition",
+      "parameterValues": {
+        "eventTypeId": "view"
+      }
+  },
+  "actions": [
+    {
+      "type": "predictiveLeadScoringAction",
+      "parameterValues": {
+      }
+    }
+  ]
+}

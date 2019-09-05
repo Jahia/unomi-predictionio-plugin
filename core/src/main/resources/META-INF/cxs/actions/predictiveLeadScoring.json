@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "id": "predictiveLeadScoringAction",
+    "name": "Update session with predicted lead scoring",
+    "description": "This action will retrieve the predicted score based on the landing page, the referrer and the web browser",
+    "systemTags": [
+      "event",
+      "availableToEndUser",
+      "hasNoTemplate"
+    ],
+    "readOnly": true
+  },
+  "actionExecutor": "predictiveLeadScoringAction",
+  "parameters": []
+}
