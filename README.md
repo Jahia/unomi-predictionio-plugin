@@ -59,82 +59,11 @@ Deploy plugin to Apache Unomi:
     feature:repo-add mvn:org.apache.unomi/unomi-predictionio-kar/${project.version}/xml/features
     feature:install unomi-predictionio-kar
 
-Test request
-------------
+Testing
+-------
 
-    curl -X POST http://localhost:8181/context.json?sessionId=1234 \
-    -H "Content-Type: application/json" \
-    -d @- <<'EOF'
-    {
-        "source": {
-            "itemId":"homepage",
-            "itemType":"page",
-            "scope":"example"
-        },
-        "requiredProfileProperties":["*"],
-        "requiredSessionProperties":["*"],
-        "requireSegments":true
-    }
-    EOF
+You can then open a browser at the following URL to test the integration:
 
-should return something like:
-
-    {
-      "profileId": "ce1123d3-93c5-4d82-a1da-f51296fcee27",
-      "sessionId": "1234",
-      "profileProperties": {
-        "lastVisit": "2019-09-04T08:45:53Z",
-        "nbOfVisits": 1,
-        "firstVisit": "2019-09-04T08:45:53Z"
-      },
-      "sessionProperties": {
-        "sessionCity": "Geneva",
-        "operatingSystemFamily": "Unknown",
-        "userAgentNameAndVersion": "curl@@7.54.0",
-        "countryAndCity": "Switzerland@@Geneva@@2660645@@6458783",
-        "userAgent": "curl/7.54.0",
-        "userAgentName": "curl",
-        "leadScoringPrediction": 0.775,
-        "sessionCountryCode": "CH",
-        "sessionCountryName": "Switzerland",
-        "deviceCategory": "Unknown",
-        "userAgentVersion": "7.54.0",
-        "sessionAdminSubDiv2": "6458783",
-        "sessionAdminSubDiv1": "2660645",
-        "location": {
-          "lon": 6.1282508,
-          "lat": 46.1884341
-        },
-        "sessionIsp": "Cablecom",
-        "operatingSystemName": "Unknown"
-      },
-      "profileSegments": [],
-      "filteringResults": null,
-      "personalizations": null,
-      "trackedConditions": [
-        {
-          "parameterValues": {
-            "formId": "testFormTracking",
-            "pagePath": "/tracker/"
-          },
-          "type": "formEventCondition"
-        },
-        {
-          "parameterValues": {
-            "formId": "searchForm"
-          },
-          "type": "formEventCondition"
-        },
-        {
-          "parameterValues": {
-            "formId": "advancedSearchForm"
-          },
-          "type": "formEventCondition"
-        }
-      ],
-      "anonymousBrowsing": false,
-      "consents": {}
-    }
+    http://localhost:8181/predictionio
     
-The `leadScoringProbability` property should be there and have a value that represents the probability that the visitor
-will convert.    
+Click on the links and go back to `page1` to see if the probability has changed.
