@@ -79,4 +79,7 @@ You can then open a browser at the following URL to test the integration:
 
     http://localhost:8181/predictionio
     
-Click on the links and go back to `page1` to see if the probability has changed.
+First click on 'Page 1' on the top right back, then click Page 2 and go back to Page 1, 
+nothing changes, click Page 3 and go back to Page 1 and you should see the banner change.
+
+Also check the Unomi logs in the Karaf shell using : log:tail to see the probability value.
