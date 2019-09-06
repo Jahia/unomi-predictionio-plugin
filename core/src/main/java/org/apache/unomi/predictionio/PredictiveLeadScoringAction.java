@@ -18,6 +18,7 @@ package org.apache.unomi.predictionio;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -61,19 +62,24 @@ public class PredictiveLeadScoringAction implements ActionExecutor {
 
     private int getLeadScoring(Event event) {
         HttpPost httpPost = new HttpPost(predictiveLeadScoringEngineUrl);
-        String landingPageId = "example.com/page8";
-        String referrerId = "referrer9.com";
+        String landingPageId = "example.com/page8"; // default value coming from generated training data
+        String referrerId = "referrer9.com"; // default value coming from generated training data
         if ("view".equals(event.getEventType())) {
             CustomItem pageItem = (CustomItem) event.getTarget();
             Map<String,Object> pageInfo = (Map<String,Object>) pageItem.getProperties().get("pageInfo");
             landingPageId = (String) pageInfo.get("destinationURL");
             referrerId = (String) pageInfo.get("referringURL");
         }
-        // String browser = "Firefox";
-        String browser = (String) event.getSession().getProperty("userAgentName");
+        String browser = "Firefox"; // default value coming from generated training data
+        browser = (String) event.getSession().getProperty("userAgentName");
 
-        String JSON_STRING="{ \"landingPageId\": \"" + landingPageId + "\", \"referrerId\": \"" + referrerId + "\", \"browser\": \"" + browser + "\"}";
-        HttpEntity stringEntity = new StringEntity(JSON_STRING, ContentType.APPLICATION_JSON);
+        // String JSON_STRING="{ \"landingPageId\": \"" + landingPageId + "\", \"referrerId\": \"" + referrerId + "\", \"browser\": \"" + browser + "\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode leadScoringInputData = objectMapper.createObjectNode();
+        leadScoringInputData.put("landingPageId", landingPageId);
+        leadScoringInputData.put("referrerId", referrerId);
+        leadScoringInputData.put("browser", browser);
+        HttpEntity stringEntity = new StringEntity(leadScoringInputData.toString(), ContentType.APPLICATION_JSON);
         httpPost.setEntity(stringEntity);
         JsonNode jsonPredictedScore = null;
         CloseableHttpResponse response = null;
@@ -85,7 +91,6 @@ public class PredictiveLeadScoringAction implements ActionExecutor {
                 if (entity != null) {
                     try {
                         responseString = EntityUtils.toString(entity);
-                        ObjectMapper objectMapper = new ObjectMapper();
                         jsonPredictedScore = objectMapper.readTree(responseString);
                         double predictedScore = jsonPredictedScore.get("score").asDouble() * 100.0;
                         if (predictedScore >= 0) {

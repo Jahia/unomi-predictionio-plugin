@@ -1,177 +1,258 @@
-<!--
-~ Licensed to the Apache Software Foundation (ASF) under one or more
-~ contributor license agreements. See the NOTICE file distributed with
-~ this work for additional information regarding copyright ownership.
-~ The ASF licenses this file to You under the Apache License, Version 2.0
-~ (the "License"); you may not use this file except in compliance with
-~ the License. You may obtain a copy of the License at
-~
-~ http://www.apache.org/licenses/LICENSE-2.0
-~
-~ Unless required by applicable law or agreed to in writing, software
-~ distributed under the License is distributed on an "AS IS" BASIS,
-~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-~ See the License for the specific language governing permissions and
-~ limitations under the License.
--->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Apache Unomi PredictionIO Test Page 1</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Starter Template - Materialize</title>
 
-    <meta name="Date-Revision-yyyymmdd" content="20180919"/>
-    <meta http-equiv="Content-Language" content="en"/>
-
-    <style type="text/css">
-        form {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            grid-gap: 16px;
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <script type="text/javascript">
+    var path = location.pathname + location.hash;
+    var unomiOption = {
+      scope: 'predictionIO',
+      url: '', // we use an empty URL to make it relative to this page.
+      initialPageProperties: {
+        path: path,
+        pageInfo: {
+          destinationURL: location.href,
+          tags: ["tag1", "tag2", "tag3"],
+          categories: ["category1", "category2", "category3"]
+        },
+        interests: {
+          "interest1": 1,
+          "interest2": 2,
+          "interest3": 3
         }
+      }
+    };
+    window.unomiTracker || (window.unomiTracker = {});
+    (function () {
+      var unomiTracker_queue = [];
 
-        label {
-            grid-column: 1 / 2;
-        }
+      var methods = ['trackSubmit', 'trackClick', 'trackLink', 'trackForm', 'initialize', 'pageview', 'identify', 'reset', 'group', 'track', 'ready', 'alias', 'debug', 'page', 'once', 'off', 'on', 'personalize'];
 
-        input,
-        button {
-            grid-column: 2 / 3;
-        }
-    </style>
-
-    <script type="text/javascript">
-        var path = location.pathname + location.hash;
-        var unomiOption = {
-            scope: 'predictionIO',
-            url: '', // we use an empty URL to make it relative to this page.
-            initialPageProperties: {
-                path: path,
-                pageInfo: {
-                    destinationURL: location.href,
-                    tags: ["tag1", "tag2", "tag3"],
-                    categories: ["category1", "category2", "category3"]
-                },
-                interests: {
-                    "interest1": 1,
-                    "interest2": 2,
-                    "interest3": 3
-                }
-            }
+      var factory = function (method) {
+        return function () {
+          var args = Array.prototype.slice.call(arguments);
+          args.unshift(method);
+          unomiTracker_queue.push(args);
+          return window.unomiTracker;
         };
-        window.unomiTracker || (window.unomiTracker = {});
-        (function () {
-            var unomiTracker_queue = [];
+      };
 
-            var methods = ['trackSubmit', 'trackClick', 'trackLink', 'trackForm', 'initialize', 'pageview', 'identify', 'reset', 'group', 'track', 'ready', 'alias', 'debug', 'page', 'once', 'off', 'on', 'personalize'];
+      // For each of our methods, generate a queueing stub.
+      for (var i = 0; i < methods.length; i++) {
+        var method = methods[i];
+        window.unomiTracker[method] = factory(method);
+      }
 
-            var factory = function (method) {
-                return function () {
-                    var args = Array.prototype.slice.call(arguments);
-                    args.unshift(method);
-                    unomiTracker_queue.push(args);
-                    return window.unomiTracker;
-                };
-            };
+      function callback(e) {
+        unomiTracker.initialize({
+          'Apache Unomi': unomiOption
+        });
 
-            // For each of our methods, generate a queueing stub.
-            for (var i = 0; i < methods.length; i++) {
-                var method = methods[i];
-                window.unomiTracker[method] = factory(method);
+        // Loop through the interim analytics queue and reapply the calls to their
+        // proper analytics.js method.
+        while (unomiTracker_queue.length > 0) {
+          var item = unomiTracker_queue.shift();
+          var method = item.shift();
+          if (unomiTracker[method]) {
+            unomiTracker[method].apply(unomiTracker, item);
+          }
+        }
+      }
+
+      // Define a method to load Analytics.js from our CDN,
+      // and that will be sure to only ever load it once.
+      unomiTracker.load = function () {
+        // Create an async script element based on your key.
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        // TODO we might want to add a check on the url to see if it ends with / or not
+        script.src = unomiOption.url + '/tracker/unomi-tracker.js';
+
+        if (script.addEventListener) {
+          script.addEventListener('load', function (e) {
+            if (typeof callback === 'function') {
+              callback(e);
             }
-
-            function callback(e) {
-                unomiTracker.initialize({
-                    'Apache Unomi': unomiOption
-                });
-
-                // Loop through the interim analytics queue and reapply the calls to their
-                // proper analytics.js method.
-                while (unomiTracker_queue.length > 0) {
-                    var item = unomiTracker_queue.shift();
-                    var method = item.shift();
-                    if (unomiTracker[method]) {
-                        unomiTracker[method].apply(unomiTracker, item);
-                    }
-                }
+          }, false);
+        } else {
+          script.onreadystatechange = function () {
+            if (this.readyState === 'complete' || this.readyState === 'loaded') {
+              callback(window.event);
             }
+          };
+        }
 
-            // Define a method to load Analytics.js from our CDN,
-            // and that will be sure to only ever load it once.
-            unomiTracker.load = function () {
-                // Create an async script element based on your key.
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.async = true;
-                // TODO we might want to add a check on the url to see if it ends with / or not
-                script.src = unomiOption.url + '/tracker/unomi-tracker.js';
+        // Insert our script next to the first script element.
+        var first = document.getElementsByTagName('script')[0];
+        first.parentNode.insertBefore(script, first);
+      };
 
-                if (script.addEventListener) {
-                    script.addEventListener('load', function (e) {
-                        if (typeof callback === 'function') {
-                            callback(e);
-                        }
-                    }, false);
-                } else {
-                    script.onreadystatechange = function () {
-                        if (this.readyState === 'complete' || this.readyState === 'loaded') {
-                            callback(window.event);
-                        }
-                    };
-                }
+      document.addEventListener('DOMContentLoaded', unomiTracker.load);
 
-                // Insert our script next to the first script element.
-                var first = document.getElementsByTagName('script')[0];
-                first.parentNode.insertBefore(script, first);
-            };
-
-            document.addEventListener('DOMContentLoaded', unomiTracker.load);
-
-            unomiTracker.page(unomiOption.initialPageProperties);
-        })();
-    </script>
+      unomiTracker.page(unomiOption.initialPageProperties);
+    })();
+  </script>
 </head>
 <body>
-<nav>
-    <a href="page1.html">Page 1</a>
-    <a href="page2.html">Page 2</a>
-    <a href="page3.html">Page 3</a>
-</nav>
-<h1>Apache Unomi PredictionIO Integration Test Page</h1>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">ApacheCon</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="page1.html">Page 1</a></li>
+        <li><a href="page2.html">Page 2</a></li>
+        <li><a href="page3.html">Page 3</a></li>
+      </ul>
 
-<div id="var1" style="display: none">
-    Probability that visitor will become a lead > 70%
-</div>
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="page1.html">Page 1</a></li>
+        <li><a href="page2.html">Page 2</a></li>
+        <li><a href="page3.html">Page 3</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
 
-<div id="var2" style="display: none">
-    Probability that visitor will become a lead < 70% or unknown
-</div>
+  <div id="var1" style="display: none" class="section no-pad-bot" id="index-banner-2">
+    <div class="container">
+      <br><br>
+      <h1 class="header center green-text">Ready to buy?</h1>
+      <div class="row center">
+        <h5 class="header col s12 light">Probability that visitor will become a lead > 70%</h5>
+      </div>
+      <div class="row center">
+        <a href="http://materializecss.com/getting-started.html" id="download-button-2" class="btn-large waves-effect waves-light green">Buy now</a>
+      </div>
+      <br><br>
 
-<script type="text/javascript">
-    unomiTracker.personalize({
-        "id": "testPersonalization",
-        "strategy": "matching-first",
-        "strategyOptions": {"fallback": "var2"},
-        "contents": [{
-            "id": "var1",
-            "filters": [{
-                "condition": {
-                    "type": "profilePropertyCondition",
-                    "parameterValues": {
-                        "propertyName": "properties.leadScoringProbability",
-                        "comparisonOperator": "greaterThan",
-                        "propertyValueInteger" : 70
-                    }
-                }
-            }]
-        }, {
-            "id": "var2"
-        }]
-    }, function (res) {
-        console.log(res);
-        document.getElementById(res[0]).style.display = 'block';
-    });
-</script>
+    </div>
+  </div>
 
-</body>
+  <div id="var2" style="display: none" class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h1 class="header center orange-text">Check us out</h1>
+      <div class="row center">
+        <h5 class="header col s12 light">Probability that visitor will become a lead < 70% or unknown</h5>
+      </div>
+      <div class="row center">
+        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light orange">Learn more</a>
+      </div>
+      <br><br>
+
+    </div>
+  </div>
+
+  <script type="text/javascript">
+      unomiTracker.personalize({
+          "id": "testPersonalization",
+          "strategy": "matching-first",
+          "strategyOptions": {"fallback": "var2"},
+          "contents": [{
+              "id": "var1",
+              "filters": [{
+                  "condition": {
+                      "type": "profilePropertyCondition",
+                      "parameterValues": {
+                          "propertyName": "properties.leadScoringProbability",
+                          "comparisonOperator": "greaterThan",
+                          "propertyValueInteger" : 70
+                      }
+                  }
+              }]
+          }, {
+              "id": "var2"
+          }]
+      }, function (res) {
+          console.log(res);
+          document.getElementById(res[0]).style.display = 'block';
+      });
+  </script>
+
+
+  <div class="container">
+    <div class="section">
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">flash_on</i></h2>
+            <h5 class="center">Speeds up development</h5>
+
+            <p class="light">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components. Additionally, we refined animations and transitions to provide a smoother experience for developers.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">group</i></h2>
+            <h5 class="center">User Experience Focused</h5>
+
+            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates components and animations that provide more feedback to users. Additionally, a single underlying responsive system across all platforms allow for a more unified user experience.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center light-blue-text"><i class="material-icons">settings</i></h2>
+            <h5 class="center">Easy to work with</h5>
+
+            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are also always open to feedback and can answer any questions a user may have about Materialize.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <br><br>
+  </div>
+
+  <footer class="page-footer orange">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Company Bio</h5>
+          <p class="grey-text text-lighten-4">We are a team of college students working on this project like it's our full time job. Any amount would help support and continue development on this project and is greatly appreciated.</p>
+
+
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Settings</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+            <li><a class="white-text" href="#!">Link 3</a></li>
+            <li><a class="white-text" href="#!">Link 4</a></li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Connect</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+            <li><a class="white-text" href="#!">Link 3</a></li>
+            <li><a class="white-text" href="#!">Link 4</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  </body>
 </html>
