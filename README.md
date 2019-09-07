@@ -27,7 +27,7 @@ Requirements
 Installation
 ------------ 
 
-Install & Start PredictionIO:
+Install & Start PredictionIO (With Docker):
 
     git clone https://github.com/apache/predictionio.git
     cd predictionio
@@ -40,24 +40,47 @@ Install & Start PredictionIO:
          -f pgsql/docker-compose.model.yml \
          up
 
-Build, Train & deploy Lead Scoring PredictionIO template:
+Install & Start PredictionIO (From Source):
+
+    PredictionIO-0.14.0/bin/pio eventserver &
+    PredictionIO-0.14.0/bin/pio status
+
+Build, Train & deploy Lead Scoring PredictionIO template (with Docker):
 
     git clone https://github.com/sergehuber/template-scala-parallel-leadscoring.git MyLeadScoring
     cd MyLeadScoring
-    export PATH=**REPLACE_WITH_PATH_TO_PREDICTIONIO_SRC**/docker/bin/:$PATH    
+    git checkout unomi-integration
+    export PATH=**REPLACE_WITH_PATH_TO_PREDICTIONIO_SRC**/docker/bin/:$PATH
+    pio-docker app new MyLeadScoring    
     pio-docker build --verbose
     pio-docker app list
     ACCESS_KEY=cdelLgZqZxj7CI_2hDM_vy-Q3fhLDxlTQKao_UHe9DgcFLkSVm9Yfq_3ve8BTgzl
+    pip install predictionio
     python data/import_eventserver.py --access_key $ACCESS_KEY
     pio-docker train
     pio-docker deploy
-    
+
+Build, Train & deploy Lead Scoring PredictionIO template (with Docker):
+
+    git clone https://github.com/sergehuber/template-scala-parallel-leadscoring.git MyLeadScoring
+    cd MyLeadScoring
+    git checkout unomi-integration
+    export PATH=**REPLACE_WITH_PATH_TO_PREDICTIONIO_SRC**/bin/:$PATH
+    pio app new MyLeadScoring    
+    pio build --verbose
+    pio app list
+    ACCESS_KEY=cdelLgZqZxj7CI_2hDM_vy-Q3fhLDxlTQKao_UHe9DgcFLkSVm9Yfq_3ve8BTgzl
+    pip install predictionio
+    python data/import_eventserver.py --access_key $ACCESS_KEY
+    pio train
+    pio deploy
+
 Download, configure and start ElasticSearch 5.6.3
     
     curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.3.tar.gz
     tar zxvf elasticsearch-5.6.3.tar.gz
     cd elasticsearch-5.6.3
-    change cluster.name to cluster.name: contextElasticSearch in config/elasticsearch.yml file
+    change cluster.name to cluster.name: contextElasticSearch-COMPUTERNAME in config/elasticsearch.yml file
     bin/elasticsearch
     
 Compile & start Apache Unomi:
