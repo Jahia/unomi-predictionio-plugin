@@ -110,7 +110,7 @@ public class PredictiveLeadScoringAction implements ActionExecutor {
                 EntityUtils.consumeQuietly(response.getEntity());
             }
         }
-        return EventService.SESSION_UPDATED;
+        return EventService.PROFILE_UPDATED;
     }
 
     public void setPredictiveLeadScoringEngineUrl(String predictiveLeadScoringEngineUrl) {
