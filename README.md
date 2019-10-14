@@ -42,8 +42,28 @@ Install & Start PredictionIO (With Docker):
 
 Install & Start PredictionIO (From Source):
 
-    PredictionIO-0.14.0/bin/pio eventserver &
-    PredictionIO-0.14.0/bin/pio status
+    wget https://archive.apache.org/dist/predictionio/0.14.0/apache-predictionio-0.14.0.tar.gz
+    mkdir apache-predictionio-0.14.0
+    cd apache-prediction-0.14.0
+    tar zxvf ../apache-predictionio-0.14.0.tar.gz
+    ./make-distribution.sh
+    tar zxvf PredictionIO-0.14.0.tar.gz
+    cd PredictionIO-0.14.0
+    mkdir vendors
+    wget https://archive.apache.org/dist/spark/spark-2.1.3/spark-2.1.3-bin-hadoop2.7.tgz
+    tar zxvfC spark-2.1.3-bin-hadoop2.7.tgz vendors
+    cd lib 
+    wget https://jdbc.postgresql.org/download/postgresql-42.2.8.jar
+    cd ..
+    edit conf/pio-env.sh to point to proper version of spark and postgres driver. Should look like this:
+    SPARK_HOME=$PIO_HOME/vendors/spark-2.1.3-bin-hadoop2.7
+    POSTGRES_JDBC_DRIVER=$PIO_HOME/lib/postgresql-42.2.8.jar
+    brew install postgresql
+    createdb pio
+    pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
+    psql -c "create user pio with password 'pio'"
+    bin/pio eventserver &
+    bin/pio status
 
 Build, Train & deploy Lead Scoring PredictionIO template (with Docker):
 
@@ -60,7 +80,7 @@ Build, Train & deploy Lead Scoring PredictionIO template (with Docker):
     pio-docker train
     pio-docker deploy
 
-Build, Train & deploy Lead Scoring PredictionIO template (with Docker):
+Build, Train & deploy Lead Scoring PredictionIO template (with Source):
 
     git clone https://github.com/sergehuber/template-scala-parallel-leadscoring.git MyLeadScoring
     cd MyLeadScoring
@@ -90,8 +110,9 @@ Compile & start Apache Unomi:
     ./buildAndRunNoTests.sh
     unomi:start (in Karaf shell) 
     
-Deploy plugin to Apache Unomi (in Karaf shell):
+Build & Deploy this plugin to Apache Unomi (in Karaf shell):
 
+    make clean install
     feature:repo-add mvn:org.apache.unomi/unomi-predictionio-kar/${project.version}/xml/features
     feature:install unomi-predictionio-kar
 
